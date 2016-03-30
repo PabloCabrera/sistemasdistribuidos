@@ -1,0 +1,26 @@
+﻿Repaso Java
+
+Parte A
+1) Escriba la clase Fraccion, que contenga numerador y denominador, con sus métodos set y get correspondientes. Deberá tener el constructor vacío (Fraccion 1/1) y uno con parámetros.
+2) Agregue a la clase Fraccion el método toString(), sobreescribiéndolo adecuadamente.
+3) Hace un método privado en la clase Fraccion, mcd, que encuentre el máximo común divisor entre numerador y denominador.
+4) Crear una excepción DenominadorCero,  que será lanzada por los constructores en caso de que se desee crear un objeto Fraccion con denominador en cero.
+5) Modificar los constructores para que toda Fraccion esté siempre simplificada.
+6) Crear los métodos sumar y restar. Estos métodos deben recibir una Fracción y devolver otra con la suma o restar, respectivamente. 
+7) Crear el método compareTo que reciba una Fraccion, y develva un entero positivo, negativo o cero si la Fraccion es mayor, menor o igual al parámetro. 
+8) Realizar un cliente de consola que muestra un sencillo menú, que permita ingresar dos fracciones, ver sus valores, operar sobre ellas y mostrar los resultados. 
+
+Parte B
+1) Escriba clase LinkedList, que contenga modelará una lista encadenada. La misma debe poder almacenar un número no conocido de ListItems. La lista debe ser genérica, es decir, debe permitir agregar elementos de tipo Object. Cada elemento se agregará al final. Escribir métodos para obtener el primer elemento. También escribir lo necesario para poder recorrer la lista desde el principio al final.
+2) Crear la clase LinkedListBackwards que extienda LinkedList y que ahora permita recorrer la lista desde atrás hacia adelante.
+3) Agregar métodos a la clase ListItem que permitan agregar y borrar elementos en la posición actual.
+4) Escribir una clase Agenda, que permita ingresar pares (Nombre, Teléfono), y que los guarde usando LinkedList. El menú de consola de esta clase debe permitir buscar por nombre o teléfono, y mostrar todos los datos ordenados alfabéticamente por nombre.
+
+Parte C
+1) Para modelar un control remoto, que puede llegar a manejar un TV, DVD, BluRay, etc, diseñe una interface RemoteControl que liste las acciones básicas que todo control remoto debería tener. Por ejemplo, volumeUp, volumeDown, powerOnOff, etc. Piense tambien en las constantes necesarias.
+2) Escriba la clase TV que implemente la interface del punto 1. Escriba la clase MyTV que presenta un menu con las opciones del TV y permite operar sobre él, mostrando siempre su estado.
+3) Escriba la clase DVD que implemente la interface del punto 1.
+4) Escriba la clase TestRemoteControl, que cree al azar cinco objetos, que pueden ser TVs o DVDs, eligiendo al azar su identificador (marca comercial). Para cada uno de ellos, que lo encienda, que genere tres acciones al azar, y que despues los apague. La ejecución de esta clase debe mostrar una leyenda por consola que diga qué acción el control está ejecutando.
+
+
+
