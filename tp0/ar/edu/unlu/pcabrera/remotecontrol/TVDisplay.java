@@ -1,4 +1,4 @@
-package ar.edu.unlu.pcabrera.remotecontrol
+package ar.edu.unlu.pcabrera.remotecontrol;
 
 public interface TVDisplay {
 	public void setChannel (int channel);

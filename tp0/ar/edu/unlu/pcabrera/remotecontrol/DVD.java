@@ -1,4 +1,4 @@
-package ar.edu.unlu.pcabrera.remotecontrol
+package ar.edu.unlu.pcabrera.remotecontrol;
 
 class DVD implements RemoteControl {
 	/* Configuracion */

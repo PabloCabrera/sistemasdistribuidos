@@ -1,4 +1,4 @@
-package ar.edu.unlu.pcabrera.remotecontrol
+package ar.edu.unlu.pcabrera.remotecontrol;
 
 class TV implements RemoteControl {
 	/* Configuracion */
@@ -96,6 +96,7 @@ class TV implements RemoteControl {
 		} else {
 			this.setMode (MODE_OFF);
 		}
+		this.notifyChannel();
 		this.notifyPower();
 	}
 
@@ -114,9 +115,11 @@ class TV implements RemoteControl {
 	public void volumeUp() {
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.mode = MODE_CLEAN;
+			this.muted = false;
 			if (this.volume < VOLUME_MAX) {
 				this.volume++;
 			}
+			this.notifyMuted();
 			this.notifyVolume();
 		}
 	}
@@ -124,9 +127,11 @@ class TV implements RemoteControl {
 	public void volumeDown() {
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.mode = MODE_CLEAN;
+			this.muted = false;
 			if (this.volume > VOLUME_MIN) {
 				this.volume--;
 			}
+			this.notifyMuted();
 			this.notifyVolume();
 		}
 	}

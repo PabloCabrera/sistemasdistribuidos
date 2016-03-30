@@ -1,4 +1,4 @@
-package ar.edu.unlu.pcabrera.remotecontrol
+package ar.edu.unlu.pcabrera.remotecontrol;
 
 public class TestTextTV {
 	public static void main (String[] args) {

@@ -1,4 +1,5 @@
-package ar.edu.unlu.pcabrera.remotecontrol
+package ar.edu.unlu.pcabrera.remotecontrol;
+
 public class TestGraphicTV {
 	public static void main (String[] args) {
 		TV tv = null;
@@ -8,8 +9,8 @@ public class TestGraphicTV {
 		try {
 
 			tv = new TV();
+			display = new GraphicTVDisplay();
 			control = new GraphicControl();
-			display = new TextTVDisplay();
 
 			control.setControllable(tv);
 			tv.setDisplay(display);
