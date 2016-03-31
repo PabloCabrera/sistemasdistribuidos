@@ -1,29 +1,37 @@
 package ar.edu.unlu.pcabrera.remotecontrol;
 
+import java.util.GregorianCalendar;
+
 class DVD implements RemoteControl {
 	/* Configuracion */
-	private static final int VOLUME_MIN = 0;
-	private static final int VOLUME_MAX = 100;
+	public static final int VOLUME_MIN = 0;
+	public static final int VOLUME_MAX = 5;
+	public static final int TRACK_MIN = 1;
+	public static final int TRACK_MAX = 8;
 
 	/* Modo */
-	private static byte MODE_OFF = 0; // Off
-	private static byte MODE_PLAYING = 1; // On, playing
-	private static byte MODE_PAUSED = 2; // On, paused
-	private static byte MODE_STOPPED = 3; // On, stopped
+	public static final byte MODE_OFF = 0; // Off
+	public static final byte MODE_PLAYING = 1; // On, playing
+	public static final byte MODE_PAUSED = 2; // On, paused
+	public static final byte MODE_STOPPED = 3; // On, stopped
+	public static final byte MODE_EJECT = 4; // On, tray out
 
 	/* Estado */
-	private int volume = 20;
-	private boolean muted = false;
+	private int volume = 3;
+	private int track = 1;
 	private long playTime;
 	private long pausedTime = 0;
 	private byte mode  = MODE_OFF;
 	private DVDDisplay display = null;
+	private Thread notifier = null;
 
 	public DVD() {};
 
 	/* Funciones de conexion */
 	public void setDisplay(DVDDisplay display) {
 		this.display = display;
+		this.notifier = new Thread (new DVDTimeNotifier (this, display));
+		this.notifier.start();
 	}
 
 	/* Funciones internas */
@@ -31,35 +39,38 @@ class DVD implements RemoteControl {
 		this.mode = mode;
 	}
 
-	private void inputNumber (int number) {
-		if (this.mode == MODE_CLEAN) {
-			this.setMode (MODE_CHANNEL);
-			this.tmpNumber = number;
-			this.writeChannel();
-		} else if (this.mode == MODE_CHANNEL) {
-			this.tmpNumber = this.tmpNumber*10 + number;
-			this.setChannel(this.tmpNumber);
-		}
-	}
-
-	private void notifyPower() {
-		if (this.display != null) {
-			this.display.setPower (this.mode != MODE_OFF);
-		}
-	}
-
-	private void notifyVolume() {
+	private void notifyVolume () {
 		/* OSD volumen */
 		if (this.display != null) {
-			this.display.setVolume (this.volume);
+			this.display.notifyVolume (this.volume);
 		}
 	}
 
-	private void notifyMuted() {
-		/* OSD mute */
+	private void notifyStatus () {
 		if (this.display != null) {
-			this.display.setMuted (this.muted);
+			this.display.notifyStatus (this.mode);
 		}
+	}
+
+	private void notifyTrack () {
+		if (this.display != null) {
+			this.display.notifyTrack (this.track);
+		}
+	}
+
+	public long getPlayTime() {
+		/* Returns the timestamp for start playing time */
+		return this.playTime;
+	}
+
+	public long getPausedTime() {
+		/* Returns the timestamp for start playing time */
+		return this.pausedTime;
+	}
+
+	public byte getStatus() {
+		/* Returns current status */
+		return this.mode;
 	}
 
 
@@ -70,55 +81,91 @@ class DVD implements RemoteControl {
 		} else {
 			this.setMode (MODE_OFF);
 		}
-		this.notifyPower();
+		this.notifyStatus();
 	}
 
 	public void play() {
+		long now = new GregorianCalendar().getTimeInMillis();
+
 		if (this.mode == MODE_STOPPED) {
-			this.pausedTime = 0;
-			this.playTime = new Calendar().getTimeInMilis();
+			this.playTime = now;
 			this.mode = MODE_PLAYING;
-			this.notifyPlay();
+			this.notifyStatus();
+		} else if (this.mode == MODE_PAUSED) {
+			this.playTime += (now - this.pausedTime); // Hack feo
+			this.mode = MODE_PLAYING;
+			this.notifyStatus();
 		}
 	}
 
-	public void pause() {}
-	public void stop() {}
-	public void rec() {}
-	public void trackNext() {}
-	public void trackPrevious() {}
-	public void eject() {}
+	public void pause() {
+		long now = new GregorianCalendar().getTimeInMillis();
+
+		if (this.mode == MODE_PLAYING) {
+			this.pausedTime = now;
+			this.mode = MODE_PAUSED;
+			this.notifyStatus();
+		} else if (this.mode == MODE_PAUSED) {
+			this.play();
+		}
+	}
+	public void stop() {
+		if (this.mode == MODE_PLAYING || this.mode == MODE_PAUSED) {
+			this.setMode (MODE_STOPPED);
+			this.notifyStatus ();
+		}
+	}
+	public void trackNext() {
+		if (this.mode != MODE_OFF && this.mode != MODE_EJECT && this.track < TRACK_MAX) {
+			this.track++;
+			this.notifyTrack ();
+			this.setMode(MODE_STOPPED);
+			this.play();
+		}
+	}
+	public void trackPrevious() {
+		if (this.mode != MODE_OFF && this.mode != MODE_EJECT && this.track > TRACK_MIN) {
+			this.track--;
+			this.notifyTrack ();
+			this.setMode(MODE_STOPPED);
+			this.play();
+		}
+	}
+
+	public void eject() {
+		if (this.mode == MODE_EJECT) {
+			this.setMode(MODE_STOPPED);
+			this.notifyStatus();
+		} else if (this.mode != MODE_OFF) {
+			this.setMode(MODE_EJECT);
+			this.notifyStatus();
+		}
+	}
 
 
 	public void volumeUp() {
-		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
-			this.mode = MODE_CLEAN;
-			if (this.volume < VOLUME_MAX) {
-				this.volume++;
-			}
+		if (this.mode != MODE_OFF && this.volume < VOLUME_MAX) {
+			this.volume++;
 			this.notifyVolume();
 		}
 	}
 
 	public void volumeDown() {
-		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
-			this.mode = MODE_CLEAN;
-			if (this.volume > VOLUME_MIN) {
-				this.volume--;
-			}
+		if (this.mode != MODE_OFF && this.volume > VOLUME_MIN) {
+			this.volume--;
 			this.notifyVolume();
 		}
 	}
 
 	public void mute() {
-		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
-			this.mode = MODE_CLEAN;
-			this.muted = !this.muted;
-			this.notifyMuted();
+		if (this.mode != MODE_OFF) {
+			this.volume = 0;
+			this.notifyVolume();
 		}
 	}
 
 	/* Estos no hacen nada */
+	public void rec() {}
 	public void number0() {}
 	public void number1() {}
 	public void number2() {}

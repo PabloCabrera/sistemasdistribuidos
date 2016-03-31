@@ -1,6 +1,5 @@
 package ar.edu.unlu.pcabrera.remotecontrol;
 
-import java.util.GregorianCalendar;
 import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -78,9 +77,7 @@ public class GraphicTVDisplay extends JFrame implements TVDisplay {
 
 	public void paint (Graphics graphics) {
 		Graphics2D g2d;
-		long now;
 
-		now = (new GregorianCalendar()).getTimeInMillis();
 		g2d = (Graphics2D) graphics;
 		g2d.setFont (TV_OSD_FONT);
 
