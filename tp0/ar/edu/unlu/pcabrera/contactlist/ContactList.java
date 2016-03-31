@@ -22,7 +22,7 @@ public class ContactList extends LinkedList {
 				currentName = currentContact.getName();
 				newName = newContact.getName();
 
-				if (currentName.compareTo(newName) > 0) {
+				if (currentName.toLowerCase().compareTo(newName.toLowerCase()) > 0) {
 					cont = false;
 				} else {
 					pos++;
