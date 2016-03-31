@@ -3,7 +3,6 @@ package ar.edu.unlu.pcabrera.adt;
 //Class is not public. Only accesible from same package
 class ListItem {
 	protected Object data = null; // Stored element
-	//private ListItem previous = null; // Previous item in double-linked list
 	private ListItem next = null; // Next element in either single or double linked list
 
 	public ListItem () {
