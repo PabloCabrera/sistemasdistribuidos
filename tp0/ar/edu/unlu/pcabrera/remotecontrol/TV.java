@@ -1,38 +1,43 @@
 package ar.edu.unlu.pcabrera.remotecontrol;
 
 class TV implements RemoteControl {
-	/* Configuracion */
+	/* Config */
 	private static int VOLUME_MIN = 0;
 	private static int VOLUME_MAX = 100;
 	private static int CHANNEL_MIN = 1;
 	private static int CHANNEL_MAX = 99;
 
-	/* Modo */
-	private static byte MODE_OFF = 0; //Apagado
-	private static byte MODE_CLEAN = 1; //Encendido, normal
-	private static byte MODE_CHANNEL = 2; //Escribiendo canal
+	/* Mode */
+	private static byte MODE_OFF = 0; // OFF
+	private static byte MODE_CLEAN = 1; // ON, NORMAL
+	private static byte MODE_CHANNEL = 2; // ON, WRITTING CHANNEL
 
-	/* Estado */
+	/* Status */
 	private int channel = 1;
 	private int volume = 20;
 	private boolean muted = false;
 	private byte mode  = MODE_OFF;
 	private int tmpNumber = 0;
+
+	/* Display */
 	private TVDisplay display = null;
 
-	public TV() {};
+	public TV () {
+		/* Constructor */
+	};
 
-	/* Funciones de conexion */
 	public void setDisplay(TVDisplay display) {
+		/* Attach TV Display */
 		this.display = display;
 	}
 
-	/* Funciones internas */
 	private void setMode (byte mode) {
+		/* Set current mode */
 		this.mode = mode;
 	}
 
 	private void setChannel (int channel) {
+		/* Set current channel */
 		if (channel < CHANNEL_MIN) {
 			this.channel = CHANNEL_MAX;
 		} else if (channel > CHANNEL_MAX) {
@@ -45,52 +50,59 @@ class TV implements RemoteControl {
 	}
 
 	private void inputNumber (int number) {
+		/* Handle numeric button pressed event */
 		if (this.mode == MODE_CLEAN) {
+			/* If not previously writting channel, store input in temporal variable */
 			this.setMode (MODE_CHANNEL);
 			this.tmpNumber = number;
 			this.writeChannel();
 		} else if (this.mode == MODE_CHANNEL) {
+			/* If previously writting channel, calculate full number and set channel */
 			this.tmpNumber = this.tmpNumber*10 + number;
 			this.setChannel(this.tmpNumber);
 		}
 	}
 
 	private void notifyPower() {
+		/* Notify power status to display */
 		if (this.display != null) {
 			this.display.setPower (this.mode != MODE_OFF);
 		}
 	}
 
 	private void notifyChannel() {
-		/* OSD numero canal */
+		/* Notify current channel to display */
 		if (this.display != null) {
 			this.display.setChannel (this.channel);
 		}
 	}
 
 	private void notifyVolume() {
-		/* OSD volumen */
+		/* Notify current volume to display */
 		if (this.display != null) {
 			this.display.setVolume (this.volume);
 		}
 	}
 
 	private void notifyMuted() {
-		/* OSD mute */
+		/* Notify audio muted to display */
 		if (this.display != null) {
 			this.display.setMuted (this.muted);
 		}
 	}
 
 	private void writeChannel() {
+		/* Write incomplete input number */
 		if (this.display != null) {
 			this.display.writeChannel (this.tmpNumber + "_");
 		}
 	}
 
 
-	/* Control remoto*/
+	/* Implementing RemoteControl Interface */
+
 	public void powerOnOff() {
+		/* Turn ON/OFF and notify to display */
 		if (this.mode == MODE_OFF) {
 			this.setMode (MODE_CLEAN);
 		} else {
@@ -101,18 +113,21 @@ class TV implements RemoteControl {
 	}
 
 	public void channelNext() {
+		/* Increase channel and notify to display */
 		 if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.setChannel(this.channel +1);
 		}
 	}
 
 	public void channelPrev() {
+		/* Decrease channel and notify to display */
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.setChannel (this.channel -1);
 		}
 	}
 
 	public void volumeUp() {
+		/* Increase volume and notify to display */
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.mode = MODE_CLEAN;
 			this.muted = false;
@@ -125,6 +140,7 @@ class TV implements RemoteControl {
 	}
 
 	public void volumeDown() {
+		/* Decrease volume and notify to display */
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.mode = MODE_CLEAN;
 			this.muted = false;
@@ -137,6 +153,7 @@ class TV implements RemoteControl {
 	}
 
 	public void mute() {
+		/* Mute audio and notify to display */
 		if (this.mode == MODE_CLEAN || this.mode == MODE_CHANNEL) {
 			this.mode = MODE_CLEAN;
 			this.muted = !this.muted;

@@ -3,68 +3,56 @@ package ar.edu.unlu.pcabrera.remotecontrol;
 import java.util.GregorianCalendar;
 
 class DVD implements RemoteControl {
-	/* Configuracion */
+
+	/* Config */
 	public static final int VOLUME_MIN = 0;
 	public static final int VOLUME_MAX = 5;
 	public static final int TRACK_MIN = 1;
 	public static final int TRACK_MAX = 8;
 
-	/* Modo */
+	/* Mode */
 	public static final byte MODE_OFF = 0; // Off
 	public static final byte MODE_PLAYING = 1; // On, playing
 	public static final byte MODE_PAUSED = 2; // On, paused
 	public static final byte MODE_STOPPED = 3; // On, stopped
 	public static final byte MODE_EJECT = 4; // On, tray out
 
-	/* Estado */
+	/* DVD status */
 	private int volume = 3;
 	private int track = 1;
 	private long playTime;
 	private long pausedTime = 0;
 	private byte mode  = MODE_OFF;
+
+	/* Display */
 	private DVDDisplay display = null;
+
+	/* Playing time notifier thread */
 	private Thread notifier = null;
 
-	public DVD() {};
+	public DVD () {
+		/* Constructor */
+	};
 
-	/* Funciones de conexion */
-	public void setDisplay(DVDDisplay display) {
+	public void setDisplay (DVDDisplay display) {
+		/* Connect DVD to a DVD Display */
 		this.display = display;
 		this.notifier = new Thread (new DVDTimeNotifier (this, display));
 		this.notifier.start();
 	}
 
-	/* Funciones internas */
 	private void setMode (byte mode) {
+		/* Set mode (playing/paused/stopped/eject/off) */
 		this.mode = mode;
 	}
 
-	private void notifyVolume () {
-		/* OSD volumen */
-		if (this.display != null) {
-			this.display.notifyVolume (this.volume);
-		}
-	}
-
-	private void notifyStatus () {
-		if (this.display != null) {
-			this.display.notifyStatus (this.mode);
-		}
-	}
-
-	private void notifyTrack () {
-		if (this.display != null) {
-			this.display.notifyTrack (this.track);
-		}
-	}
-
 	public long getPlayTime() {
-		/* Returns the timestamp for start playing time */
+		/* Returns the timestamp for the starting playing time */
 		return this.playTime;
 	}
 
 	public long getPausedTime() {
-		/* Returns the timestamp for start playing time */
+		/* Returns the timestamp for the last paused time */
 		return this.pausedTime;
 	}
 
@@ -73,9 +61,33 @@ class DVD implements RemoteControl {
 		return this.mode;
 	}
 
+	private void notifyVolume () {
+		/* Notify current volume to display */
+		if (this.display != null) {
+			this.display.notifyVolume (this.volume);
+		}
+	}
 
-	/* Control remoto */
+	private void notifyStatus () {
+		/* Notify current status to display */
+		if (this.display != null) {
+			this.display.notifyStatus (this.mode);
+		}
+	}
+
+	private void notifyTrack () {
+		/* Notify current track to display */
+		if (this.display != null) {
+			this.display.notifyTrack (this.track);
+		}
+	}
+
+
+
+	/* Implementing RemoteControl interface */
+
 	public void powerOnOff() {
+		/* Turn ON/OFF and notify to display */
 		if (this.mode == MODE_OFF) {
 			this.setMode (MODE_STOPPED);
 		} else {
@@ -85,6 +97,7 @@ class DVD implements RemoteControl {
 	}
 
 	public void play() {
+		/* Play track and notify to display */
 		long now = new GregorianCalendar().getTimeInMillis();
 
 		if (this.mode == MODE_STOPPED) {
@@ -92,13 +105,16 @@ class DVD implements RemoteControl {
 			this.mode = MODE_PLAYING;
 			this.notifyStatus();
 		} else if (this.mode == MODE_PAUSED) {
-			this.playTime += (now - this.pausedTime); // Hack feo
+			/* after unpause, playTime will contain a fake value to force the following: */
+			/* now - playTime = track_elapsed_time */
+			this.playTime += (now - this.pausedTime);
 			this.mode = MODE_PLAYING;
 			this.notifyStatus();
 		}
 	}
 
 	public void pause() {
+		/* Pause/Unpause playing track and notify to display */
 		long now = new GregorianCalendar().getTimeInMillis();
 
 		if (this.mode == MODE_PLAYING) {
@@ -110,12 +126,14 @@ class DVD implements RemoteControl {
 		}
 	}
 	public void stop() {
+		/* Stop playing track and notify to display */
 		if (this.mode == MODE_PLAYING || this.mode == MODE_PAUSED) {
 			this.setMode (MODE_STOPPED);
 			this.notifyStatus ();
 		}
 	}
 	public void trackNext() {
+		/* Jump to next track (if exists) and notify to display */
 		if (this.mode != MODE_OFF && this.mode != MODE_EJECT && this.track < TRACK_MAX) {
 			this.track++;
 			this.notifyTrack ();
@@ -124,6 +142,7 @@ class DVD implements RemoteControl {
 		}
 	}
 	public void trackPrevious() {
+		/* Jump to previous track (if exists) and notify to display */
 		if (this.mode != MODE_OFF && this.mode != MODE_EJECT && this.track > TRACK_MIN) {
 			this.track--;
 			this.notifyTrack ();
@@ -133,6 +152,7 @@ class DVD implements RemoteControl {
 	}
 
 	public void eject() {
+		/* Eject or close tray and notify to display */
 		if (this.mode == MODE_EJECT) {
 			this.setMode(MODE_STOPPED);
 			this.notifyStatus();
@@ -144,6 +164,7 @@ class DVD implements RemoteControl {
 
 
 	public void volumeUp() {
+		/* Increase volume and notify to display */
 		if (this.mode != MODE_OFF && this.volume < VOLUME_MAX) {
 			this.volume++;
 			this.notifyVolume();
@@ -151,6 +172,7 @@ class DVD implements RemoteControl {
 	}
 
 	public void volumeDown() {
+		/* Decrease volume and notify to display */
 		if (this.mode != MODE_OFF && this.volume > VOLUME_MIN) {
 			this.volume--;
 			this.notifyVolume();
@@ -158,13 +180,14 @@ class DVD implements RemoteControl {
 	}
 
 	public void mute() {
+		/* Set volume to zero and notify to display */
 		if (this.mode != MODE_OFF) {
 			this.volume = 0;
 			this.notifyVolume();
 		}
 	}
 
-	/* Estos no hacen nada */
+	/* Useless buttons */
 	public void rec() {}
 	public void number0() {}
 	public void number1() {}

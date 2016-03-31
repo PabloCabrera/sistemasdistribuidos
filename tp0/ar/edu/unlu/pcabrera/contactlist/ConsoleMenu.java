@@ -14,6 +14,7 @@ class ConsoleMenu {
 		scanner = new Scanner (System.in);
 		clist = new ContactList ();
 
+		/* Loop: show main menu and parse input */
 		while (!quit) {
 			ConsoleMenu.printMenu();
 			input = scanner.nextLine();
@@ -32,6 +33,7 @@ class ConsoleMenu {
 	}
 
 	private static void printMenu () {
+		/* Show menu */
 		System.out.print ("\033[H\033[2J");
 		System.out.println ("1. Mostrar lista de contactos ");
 		System.out.println ("2. Agregar contacto");
@@ -42,6 +44,8 @@ class ConsoleMenu {
 	}
 
 	private static void showContactList (ContactList clist, Scanner scanner) {
+		/* Show contact list */
+
 		Contact contact;
 
 		System.out.print ("\033[H\033[2J");
@@ -57,6 +61,8 @@ class ConsoleMenu {
 	}
 
 	private static void inputContact (ContactList clist, Scanner scanner) {
+		/* Show new contact dialog */
+
 		String name, phone;
 		Contact contact = null;
 
@@ -73,6 +79,8 @@ class ConsoleMenu {
 	}
 	
 	private static void searchContactByName (ContactList clist, Scanner scanner) {
+		/* Show search contact by name dialog */
+
 		String input, needle, haystack;
 		Contact contact;
 
@@ -97,6 +105,8 @@ class ConsoleMenu {
 	}
 
 	private static void searchContactByPhone (ContactList clist, Scanner scanner) {
+		/* Show search contact by name dialog */
+
 		String input, needle, haystack;
 		Contact contact;
 

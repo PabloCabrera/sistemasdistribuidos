@@ -16,6 +16,7 @@ public class ContactList extends LinkedList {
 
 		iter = this.iterator ();
 		while (iter.hasNext() && cont) {
+			/* When this loop finish pos will be the insert position for new contact */
 			element = iter.next();
 			if (element instanceof Contact) {
 				currentContact = (Contact) element;
