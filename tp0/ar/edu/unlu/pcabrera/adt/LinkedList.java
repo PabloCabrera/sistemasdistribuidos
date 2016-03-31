@@ -20,7 +20,7 @@ public class LinkedList implements Iterable {
 		}
 	}
 
-	private ListItem getItem (int index) throws IndexOutOfBoundsException {
+	public ListItem getItem (int index) throws IndexOutOfBoundsException {
 		if (index < 1 || this.first == null) {
 			throw new IndexOutOfBoundsException ();
 		} else {
@@ -39,7 +39,9 @@ public class LinkedList implements Iterable {
 	}
 
 	public void insert  (Object item, int position) throws IndexOutOfBoundsException {
-		if (position < 0 || this.first == null) {
+		if (position == 0 && this.first == null) {
+			this.append (item);
+		} else if (position < 0 || this.first == null) {
 			throw new IndexOutOfBoundsException ();
 		} else {
 			this.first.insert (item, position);

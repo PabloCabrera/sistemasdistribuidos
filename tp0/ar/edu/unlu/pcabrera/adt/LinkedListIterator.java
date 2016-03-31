@@ -25,7 +25,16 @@ public class LinkedListIterator implements Iterator <Object> {
 	public Object next () throws NoSuchElementException {
 		this.index++;
 		this.removed = false;
-		this.currentItem = this.currentItem.getNextItem ();
+
+		if (this.currentItem == null) {
+			if (!this.list.isEmpty ()) {
+				this.currentItem = this.list.getItem (1);
+			} else {
+				throw new NoSuchElementException ();
+			}
+		} else {
+			this.currentItem = this.currentItem.getNextItem ();
+		}
 
 		if (currentItem == null) {
 			throw new NoSuchElementException ();

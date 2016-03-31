@@ -42,7 +42,9 @@ class ListItem {
 			nlitem.setNextItem (this.next);
 			this.data = item;
 			this.next = nlitem;
-		} else if (this.next == null || position < 0) {
+		} else if (this.next == null) {
+			this.append (item);
+		} else if (position < 0) {
 			throw new IndexOutOfBoundsException ();
 		} else {
 			this.next.insert (item, position -1);
