@@ -34,7 +34,7 @@ public class Wget {
 
 			System.out.println ("Recibiendo cabeceras...");
 			codigo = descarga.recibirHeaders();
-				System.err.print (codigo+ ": ");
+				System.out.print (codigo+ ": ");
 			if (codigo >= 500) {
 				System.err.println ("Error interno del servidor");
 				return false;
@@ -52,17 +52,17 @@ public class Wget {
 				return false;
 			} else if (codigo >= 300) {
 				strRedireccion = descarga.getRedireccion();
-				System.err.println ("Redirigiendo a "+strRedireccion);
+				System.out.println ("Redirigiendo a "+strRedireccion);
 				urlRedireccion = new URL(strRedireccion);
 				return Wget.descargar (urlRedireccion, opciones);
 			} else {
-				System.err.println ("OK");
+				System.out.println ("OK");
 			}
 
 			System.out.println ("Recibiendo datos...");
 			nombreGuardar = url.toString().replaceAll(".*/", "");
 			if (nombreGuardar.length() == 0) {
-				nombreGuardar = "index.html";
+				nombreGuardar = url.toString().replaceAll("[:/]+", ".")+"html";
 			}
 			System.out.println ("Se guardara en el archivo " + nombreGuardar);
 			streamGuardar = new FileOutputStream (nombreGuardar);
@@ -84,21 +84,52 @@ public class Wget {
 
 	
 	public static void main (String[] args) {
-		URL url = null;
+		WgetOpciones opciones;
 
 		if (args.length == 0) {
 			mostrarAyuda();
 		} else {
 
+			opciones = Wget.parseArgs(args);
 
-			try {
-				url = parseUrl (args[0]);
+			for (URL url: opciones.urls) {
 				descargar (url, null);
-			} catch (MalformedURLException e) {
-				System.err.println ("URL invalida");
 			}
 		}
 
+	}
+
+	public static WgetOpciones parseArgs (String[] args) {
+		WgetOpciones opciones = new WgetOpciones();
+		int parseados = 0;
+	
+		while (parseados < args.length) {
+			parseados += parseArg(args, parseados, opciones);
+		}
+
+		return opciones;
+	}
+
+	public static int parseArg(String[] args, int offset, WgetOpciones opciones) {
+		int cantidad = 1;
+		URL url;
+
+		if (args[offset].charAt(0) == '-') {
+			if (args[offset].equals("-n")) {
+				opciones.conservarFecha = false;
+			} else {
+				System.err.println ("Opcion no soportada "+ args[offset]);
+			}
+		} else {
+			try {
+				url = parseUrl(args[offset]);
+				opciones.urls.add(url);
+			} catch (MalformedURLException e) {
+				System.err.println ("URL no valida "+ args[offset]);
+			}
+		}
+
+		return cantidad;
 	}
 
 	public static URL parseUrl (String urlString) throws MalformedURLException {
