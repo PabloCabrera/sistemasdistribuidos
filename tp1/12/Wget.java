@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Wget {
 
@@ -70,7 +72,10 @@ public class Wget {
 			if (nombreGuardar.length() == 0) {
 				nombreGuardar = url.toString().replaceAll("[:/]+", ".")+"html";
 			}
-			System.out.println ("Se guardara en el archivo " + nombreGuardar);
+			if (opciones.directorio != null) {
+				nombreGuardar = opciones.directorio + "/" + nombreGuardar;
+			}
+			System.out.println ("Descargando en " + nombreGuardar);
 			streamGuardar = new FileOutputStream (nombreGuardar);
 			estado = descarga.recibirRecurso(streamGuardar);
 			assert (estado) : "No se recibio datos";
@@ -91,32 +96,34 @@ public class Wget {
 	
 	public static void main (String[] args) {
 		WgetOpciones opciones;
+		List<URL> urls;
 
 		if (args.length == 0) {
 			mostrarAyuda();
 		} else {
+			urls = new ArrayList<URL>();
+			opciones = new WgetOpciones();
 
-			opciones = Wget.parseArgs(args);
+			Wget.parseArgs(args, opciones, urls);
 
-			for (URL url: opciones.urls) {
-				descargar (url, null);
+			for (URL url: urls) {
+				descargar (url, opciones);
 			}
 		}
 
 	}
 
-	public static WgetOpciones parseArgs (String[] args) {
-		WgetOpciones opciones = new WgetOpciones();
+	public static WgetOpciones parseArgs (String[] args, WgetOpciones opciones, List<URL> urls) {
 		int parseados = 0;
 	
 		while (parseados < args.length) {
-			parseados += parseArg(args, parseados, opciones);
+			parseados += parseArg(args, parseados, opciones, urls);
 		}
 
 		return opciones;
 	}
 
-	public static int parseArg(String[] args, int offset, WgetOpciones opciones) {
+	public static int parseArg(String[] args, int offset, WgetOpciones opciones, List<URL> urls) {
 		int cantidad = 1;
 		URL url;
 
@@ -137,7 +144,7 @@ public class Wget {
 						while ((linea = archivoLista.readLine()) != null) {
 							try {
 								urlLinea = parseUrl (linea);
-								opciones.urls.add(urlLinea);
+								urls.add(urlLinea);
 							} catch (MalformedURLException e) {
 								System.err.println("URL no valida "+ linea);
 							}
@@ -164,6 +171,13 @@ public class Wget {
 					}
 				} else {
 					System.err.println("La opcion -o requiere un argumento");
+				}
+			} else if (args[offset].equals("-p")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					opciones.directorio = args[offset+1];
+				} else {
+					System.err.println("La opcion -http-user requiere un argumento");
 				}
 			} else if (args[offset].equals("-http-user")) {
 				if (args.length > offset +1) {
@@ -212,7 +226,7 @@ public class Wget {
 		} else {
 			try {
 				url = parseUrl(args[offset]);
-				opciones.urls.add(url);
+				urls.add(url);
 			} catch (MalformedURLException e) {
 				System.err.println ("URL no valida "+ args[offset]);
 			}
@@ -251,15 +265,15 @@ public class Wget {
 		System.err.println("No se han especifcado URLs para descargar");
 		System.err.println("Uso: java Wget [opciones] URLs");
 		System.err.println("Opciones:");
-		System.err.println("\t -c");
-		System.err.println("\t -n");
+		System.err.println("\t -c <<NO IMPLEMENTADO>>");
+		System.err.println("\t -n <<NO IMPLEMENTADO>>");
 		System.err.println("\t -i archivo_lista");
-		System.err.println("\t -o archivo_log");
+		System.err.println("\t -o archivo_log <<NO IMPLEMENTADO>>");
 		System.err.println("\t -p directorio_descarga");
-		System.err.println("\t -t numero_reintentos");
-		System.err.println("\t -http-proxy servidor:puerto");
-		System.err.println("\t -http-user usuario");
-		System.err.println("\t -http-password password");
+		System.err.println("\t -t numero_reintentos <<NO IMPLEMENTADO>>");
+		System.err.println("\t -http-proxy servidor:puerto <<NO IMPLEMENTADO>>");
+		System.err.println("\t -http-user usuario <<NO IMPLEMENTADO>>");
+		System.err.println("\t -http-password password <<NO IMPLEMENTADO>>");
 	}
 }
 

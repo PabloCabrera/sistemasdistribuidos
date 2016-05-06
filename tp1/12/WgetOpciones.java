@@ -1,5 +1,3 @@
-import java.util.List;
-import java.util.ArrayList;
 import java.net.URL;
 import java.io.PrintStream;
 
@@ -13,9 +11,7 @@ public class WgetOpciones {
 	public int reintentos = 0;
 	public String directorio = null;
 	public boolean conservarFecha = false;
-	public List<URL> urls;
 
 	public WgetOpciones () {
-		this.urls = new ArrayList<URL>();
 	}
 }
