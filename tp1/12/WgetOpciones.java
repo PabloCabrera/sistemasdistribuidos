@@ -6,6 +6,7 @@ public class WgetOpciones {
 	public String servidorProxy = null;
 	public int puertoProxy = 8080;
 	public String archivoLista = null;
+	public String archivoLog = null;
 	public boolean continuarIncompleta = false;
 	public String usuarioHttp = null;
 	public String passwordHttp = null;

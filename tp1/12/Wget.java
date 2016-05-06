@@ -116,7 +116,64 @@ public class Wget {
 
 		if (args[offset].charAt(0) == '-') {
 			if (args[offset].equals("-n")) {
-				opciones.conservarFecha = false;
+				opciones.conservarFecha = true;
+			} else if (args[offset].equals("-c")) {
+				opciones.continuarIncompleta = true;
+			} else if (args[offset].equals("-i")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					opciones.archivoLista = args[offset+1];
+				} else {
+					System.err.println("La opcion -i requiere un argumento");
+				}
+			} else if (args[offset].equals("-o")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					opciones.archivoLog = args[offset+1];
+				} else {
+					System.err.println("La opcion -o requiere un argumento");
+				}
+			} else if (args[offset].equals("-http-user")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					opciones.usuarioHttp = args[offset+1];
+				} else {
+					System.err.println("La opcion -http-user requiere un argumento");
+				}
+			} else if (args[offset].equals("-http-password")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					opciones.passwordHttp = args[offset+1];
+				} else {
+					System.err.println("La opcion -http-password requiere un argumento");
+				}
+			} else if (args[offset].equals("-t")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					try {
+						opciones.reintentos = Integer.parseInt(args[offset+1]);
+					} catch (NumberFormatException e) {
+						System.err.println("El argumento de la opcion -t debe ser un numero");
+					}
+				} else {
+					System.err.println("La opcion -t requiere un argumento");
+				}
+			} else if (args[offset].equals("-http-proxy")) {
+				if (args.length > offset +1) {
+					cantidad++;
+					if (args[offset+1].indexOf(':') != -1) {
+						opciones.servidorProxy = args[offset+1].replaceFirst(":.*$", "");
+						try {
+							opciones.puertoProxy = Integer.parseInt (args[offset+1].replaceFirst("^.*;", ""));
+						} catch (NumberFormatException e) {
+							System.err.println("Puerto no valido para servidor proxy");
+						}
+					} else {
+						opciones.servidorProxy = args[offset+1];
+					}
+				} else {
+					System.err.println("La opcion -http-proxy requiere un argumento");
+				}
 			} else {
 				System.err.println ("Opcion no soportada "+ args[offset]);
 			}
