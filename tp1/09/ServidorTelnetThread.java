@@ -1,4 +1,5 @@
 import java.net.Socket;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +28,8 @@ class ServidorTelnetThread implements Runnable {
 	public void run() {
 		boolean cerrar = false;
 		String linea = null;
+		String dir = null;
+		File fdir = null;
 		String resultado = null;
 
 		this.servidor.log ("CONEXION ABIERTA: " + this.socket.getRemoteSocketAddress());
@@ -35,13 +38,33 @@ class ServidorTelnetThread implements Runnable {
 			this.mostrarPrompt();
 			try {
 				linea = this.input.readLine();
+
 				if(linea != null) {
-					resultado = this.servidor.ejecutarComando(linea);
-					this.output.println(resultado);
+
+					/* Cambiar directorio de trabajo */
+					if (linea.matches ("^cd *$")) {
+						/* Directorio predeterminado */
+						dir = null;
+					} else if (linea.matches ("^cd (.:)?[/\\\\]")) {
+						/* Path absoluto */
+						dir = linea.substring(3);
+					} else if (linea.matches ("^cd .*$")) {
+						/* Path relativo */
+						if (dir == null) {
+							dir = linea.substring(3);
+						} else {
+							dir = dir + "/" + linea.substring(3);
+						}
+					} else {
+						fdir = (dir == null)? null: new File (dir);
+						resultado = this.servidor.ejecutarComando(linea, fdir);
+						this.output.println(resultado);
+					}
 				} else {
 					cerrar = true;
 				}
 			} catch (Exception e) {
+				System.out.println("Excepcion: " + e.getMessage());
 				cerrar = true;
 			}
 		}

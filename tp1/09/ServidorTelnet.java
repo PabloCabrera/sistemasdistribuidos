@@ -86,13 +86,13 @@ public class ServidorTelnet {
 		}
 	}
 
-	public String ejecutarComando(String comando) {
+	public String ejecutarComando(String comando, File dir) {
 		String resultado;
 		StringBuffer output = new StringBuffer();
 		Process proceso;
 
 		try {
-			proceso = Runtime.getRuntime().exec(comando);
+			proceso = Runtime.getRuntime().exec(comando, null, dir);
 			proceso.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
 
