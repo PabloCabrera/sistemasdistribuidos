@@ -18,6 +18,7 @@ class Descarga {
 	private OutputStream output;
 	private BufferedReader reader;
 	private PrintStream printer;
+	private String redireccion = null;
 	//static private Pattern regexResultado = new Pattern.compile("^HTTP[^ ]* (\\d{3}).*");
 	
 
@@ -31,8 +32,6 @@ class Descarga {
 		String servidor;
 
 		puerto = this.url.getPort();
-
-		System.out.println ("INFO: Protocol==" + this.url.getProtocol());
 
 		if (puerto == -1) {
 			if (this.url.getProtocol().equals("https")) {
@@ -62,8 +61,9 @@ class Descarga {
 
 	public boolean enviarHeaders () {
 		try {
-			this.printer.println("GET "+this.url.getFile()+" HTTP/1.1");
+			this.printer.println("GET "+ this.url.getFile() +" HTTP/1.1");
 			this.printer.println("Host: "+this.url.getHost());
+			this.printer.println("Connection: close");
 			this.printer.println();
 		} catch (Exception e) {
 			return false;
@@ -74,14 +74,21 @@ class Descarga {
 	public int recibirHeaders() {
 		boolean fin_header = false;
 		String linea;
-		int codigo_respuesta;
+		String str_codigo_respuesta;
+		int codigo_respuesta = 200;
 
 		while (!fin_header) {
 			try {
 				linea = this.reader.readLine();
 				if(linea != null && linea.length() > 0 ) {
-					//if (regexResultado.match ())
-					System.out.println("# " +linea);
+					if (linea.matches ("^HTTP/.*")) {
+						str_codigo_respuesta = linea.replaceFirst("^[^ ]* ", "");
+						str_codigo_respuesta = str_codigo_respuesta.replaceFirst(" .*$", "");
+						codigo_respuesta = Integer.parseInt(str_codigo_respuesta);
+					} else if (linea.matches ("^Location: .*$")) {
+						this.redireccion = linea.replaceFirst ("Location: ", "");
+					}
+					//System.out.println("# " +linea);
 				} else {
 					fin_header = true;
 				}
@@ -89,7 +96,7 @@ class Descarga {
 				return -1;
 			}
 		}
-		return 200;
+		return codigo_respuesta;
 	}
 
 	public boolean recibirRecurso(OutputStream guardar) {
@@ -123,5 +130,8 @@ class Descarga {
 		return true;
 	}
 
+	public String getRedireccion () {
+		return this.redireccion;
+	}
 
 }

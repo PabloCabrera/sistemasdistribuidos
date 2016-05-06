@@ -6,12 +6,19 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 
 public class Wget {
-	
+
 	private static boolean descargar (URL url, WgetOpciones opciones) {
 		boolean estado = true;
 		int codigo;
 		String nombreGuardar = null;
 		OutputStream streamGuardar = null;
+		URL urlRedireccion;
+		String strRedireccion;
+
+		if (!url.getProtocol().equals("http")) {
+			System.err.println ("Protocolo no soportado " +url.getProtocol());
+			return false;
+		}
 
 		try {
 
@@ -27,7 +34,30 @@ public class Wget {
 
 			System.out.println ("Recibiendo cabeceras...");
 			codigo = descarga.recibirHeaders();
-			assert (codigo >= 200) : ("Codigo de respuesta: "+codigo);
+				System.err.print (codigo+ ": ");
+			if (codigo >= 500) {
+				System.err.println ("Error interno del servidor");
+				return false;
+			} else if (codigo == 404) {
+				System.err.println ("No encontrado");
+				return false;
+			} else if (codigo == 403) {
+				System.err.println ("Prohibido");
+				return false;
+			} else if (codigo == 400) {
+				System.err.println ("Peticion no valida");
+				return false;
+			} else if (codigo > 400) {
+				System.err.println ("La peticion no puede ser satisfecha o es inconrrecta");
+				return false;
+			} else if (codigo >= 300) {
+				strRedireccion = descarga.getRedireccion();
+				System.err.println ("Redirigiendo a "+strRedireccion);
+				urlRedireccion = new URL(strRedireccion);
+				return Wget.descargar (urlRedireccion, opciones);
+			} else {
+				System.err.println ("OK");
+			}
 
 			System.out.println ("Recibiendo datos...");
 			nombreGuardar = url.toString().replaceAll(".*/", "");
@@ -45,6 +75,8 @@ public class Wget {
 		} catch (FileNotFoundException|SecurityException e) {
 			System.err.println ("No se puede crear el archivo "+ nombreGuardar+": " + e.getMessage());
 			return false;
+		} catch (MalformedURLException e) {
+			System.err.println ("No se puede redirigir correctamente. URL no valida");
 		}
 		
 		return true;
@@ -57,6 +89,7 @@ public class Wget {
 		if (args.length == 0) {
 			mostrarAyuda();
 		} else {
+
 
 			try {
 				url = parseUrl (args[0]);
@@ -80,7 +113,8 @@ public class Wget {
 			urlString = "http://" + urlString;
 		}
 
-		if (urlString.matches("^[\\da-zA-Z]://[^/]*$")) {
+		if (urlString.matches("^[\\da-zA-Z]+://[^/]*$")) {
+			// Si no tiene una barra al final, agregarla
 			urlString = urlString + "/";
 		}
 
