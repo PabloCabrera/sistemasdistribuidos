@@ -1,9 +1,15 @@
 import java.net.Socket;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.io.IOException;
 
 public class Wget {
 
@@ -121,15 +127,41 @@ public class Wget {
 				opciones.continuarIncompleta = true;
 			} else if (args[offset].equals("-i")) {
 				if (args.length > offset +1) {
+					BufferedReader archivoLista;
+					String linea;
+					URL urlLinea;
+
 					cantidad++;
-					opciones.archivoLista = args[offset+1];
+					try {
+						archivoLista = new BufferedReader (new FileReader (args[offset+1]));
+						while ((linea = archivoLista.readLine()) != null) {
+							try {
+								urlLinea = parseUrl (linea);
+								opciones.urls.add(urlLinea);
+							} catch (MalformedURLException e) {
+								System.err.println("URL no valida "+ linea);
+							}
+						}
+						archivoLista.close();
+					} catch (FileNotFoundException e) {
+						System.err.println("No se puede abrir el archivo de lista de descargas "+ args[offset+1]);
+					} catch (IOException e) {
+						System.err.println("Error de entrada/salida "+ args[offset+1]);
+					}
 				} else {
 					System.err.println("La opcion -i requiere un argumento");
 				}
 			} else if (args[offset].equals("-o")) {
 				if (args.length > offset +1) {
 					cantidad++;
-					opciones.archivoLog = args[offset+1];
+					try {
+						OutputStream fos = new FileOutputStream (args[offset+1], true);
+						opciones.archivoLog = new PrintStream (fos);
+					} catch (FileNotFoundException e) {
+						System.err.println("No se puede abrir el archivo de log "+ args[offset+1]);
+					} catch (SecurityException e) {
+						System.err.println("No se disponen de permisos suficientes para escribir el archivo de log "+ args[offset+1]);
+					}
 				} else {
 					System.err.println("La opcion -o requiere un argumento");
 				}
@@ -216,8 +248,18 @@ public class Wget {
 	}
 
 	public static void mostrarAyuda() {
-		System.err.println("Wget: Falta URL");
-		System.err.println("Uso: java Wget [opciones] URL");
+		System.err.println("No se han especifcado URLs para descargar");
+		System.err.println("Uso: java Wget [opciones] URLs");
+		System.err.println("Opciones:");
+		System.err.println("\t -c");
+		System.err.println("\t -n");
+		System.err.println("\t -i archivo_lista");
+		System.err.println("\t -o archivo_log");
+		System.err.println("\t -p directorio_descarga");
+		System.err.println("\t -t numero_reintentos");
+		System.err.println("\t -http-proxy servidor:puerto");
+		System.err.println("\t -http-user usuario");
+		System.err.println("\t -http-password password");
 	}
 }
 
