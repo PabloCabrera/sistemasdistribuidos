@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.Date;
@@ -25,15 +26,28 @@ public class ServidorTelnet {
 		String arg_logfile = null;
 		ServidorTelnet servidor;
 
+		
+		if (args.length > 1) {
+			arg_logfile = args[1];
+		}
+
 		if (args.length > 0) {
 			try {
 				arg_puerto = Integer.parseInt (args[0]);
 			} catch (NumberFormatException e) {
 				System.err.println ("Warning: \"" + args[0] + "\" no es un numero de puerto valido. Se utilizara el puerto predeterminado: " + arg_puerto);
 			}
-		}
-		if (args.length > 1) {
-			arg_logfile = args[1];
+		} else {
+			Scanner scan = new Scanner (System.in);
+			try {
+				System.out.print ("Ingresar numero de puerto: ");
+				String stringPuerto = scan.nextLine();
+				arg_puerto = Integer.parseInt(stringPuerto);
+			} catch (NumberFormatException e) {
+				System.err.println ("Warning: Puerto no valido. Se utilizara el puerto predeterminado: " + arg_puerto);
+			}
+				System.out.print ("Ingresar nombre de archivo log: ");
+				arg_logfile = scan.nextLine();
 		}
 
 		servidor = new ServidorTelnet (arg_puerto, arg_logfile);
