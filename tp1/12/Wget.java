@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class Wget {
 
+
 	private static boolean descargar (URL url, WgetOpciones opciones) {
 		boolean estado = true;
 		int codigo;
@@ -33,16 +34,21 @@ public class Wget {
 			Descarga descarga = new Descarga (url,opciones);
 
 			System.out.println ("Conectando con "+url);
+			opciones.log ("Conectando con "+url);
 			estado = descarga.conectar();
 			assert (estado) : "No se pudo conectar";
 
 			System.out.println ("Enviando peticion...");
+			opciones.log ("Enviando peticion a "+url);
 			estado = descarga.enviarHeaders();
 			assert (estado) : "No se pudo enviar peticion";
 
 			System.out.println ("Recibiendo cabeceras...");
+			opciones.log ("Recibiendo cabeceras de "+url);
+
 			codigo = descarga.recibirHeaders();
-				System.out.print (codigo+ ": ");
+			System.out.print (codigo+ ": ");
+
 			if (codigo >= 500) {
 				System.err.println ("Error interno del servidor");
 				return false;
@@ -268,12 +274,13 @@ public class Wget {
 		System.err.println("\t -c <<NO IMPLEMENTADO>>");
 		System.err.println("\t -n <<NO IMPLEMENTADO>>");
 		System.err.println("\t -i archivo_lista");
-		System.err.println("\t -o archivo_log <<NO IMPLEMENTADO>>");
+		System.err.println("\t -o archivo_log");
 		System.err.println("\t -p directorio_descarga");
 		System.err.println("\t -t numero_reintentos <<NO IMPLEMENTADO>>");
 		System.err.println("\t -http-proxy servidor:puerto <<NO IMPLEMENTADO>>");
 		System.err.println("\t -http-user usuario <<NO IMPLEMENTADO>>");
 		System.err.println("\t -http-password password <<NO IMPLEMENTADO>>");
 	}
+
 }
 

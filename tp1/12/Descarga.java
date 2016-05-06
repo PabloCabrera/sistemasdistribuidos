@@ -60,11 +60,17 @@ class Descarga {
 	}
 
 	public boolean enviarHeaders () {
+		String enviar ="";
 		try {
-			this.printer.println("GET "+ this.url.getFile() +" HTTP/1.1");
-			this.printer.println("Host: "+this.url.getHost());
-			this.printer.println("Connection: close");
-			this.printer.println();
+			enviar=("GET "+ this.url.getFile() +" HTTP/1.1");
+			this.printer.println(enviar);
+			this.opciones.log("-> "+enviar);
+			enviar=("Host: "+this.url.getHost());
+			this.printer.println(enviar);
+			this.opciones.log("-> "+enviar);
+			enviar=("Connection: close\n");
+			this.printer.println(enviar);
+			this.opciones.log("-> "+enviar);
 		} catch (Exception e) {
 			return false;
 		}
@@ -88,7 +94,7 @@ class Descarga {
 					} else if (linea.matches ("^Location: .*$")) {
 						this.redireccion = linea.replaceFirst ("Location: ", "");
 					}
-					//System.out.println("# " +linea);
+					opciones.log ("<- " + linea);
 				} else {
 					fin_header = true;
 				}
