@@ -31,17 +31,20 @@ class Descarga {
 		int puerto;
 		String servidor;
 
-		puerto = this.url.getPort();
+		if (this.opciones.servidorProxy == null) {
+			servidor = this.url.getHost();
+			puerto = this.url.getPort();
 
-		if (puerto == -1) {
-			if (this.url.getProtocol().equals("https")) {
-				puerto = 443;
-			} if (this.url.getProtocol().equals("http")) {
+			if (puerto == -1 && this.url.getProtocol().equals("http")) {
 				puerto = 80;
 			}
+		} else {
+			servidor = opciones.servidorProxy;
+			puerto = opciones.puertoProxy;
+			System.out.println ("Utilizando el servidor proxy "+ servidor + ":"+puerto);
+			opciones.log ("Utilizando el servidor proxy "+ servidor + ":"+puerto);
 		}
 		
-		servidor = this.url.getHost();
 
 		try {
 			assert (puerto > 0);
@@ -62,12 +65,18 @@ class Descarga {
 	public boolean enviarHeaders () {
 		String enviar ="";
 		try {
-			enviar=("GET "+ this.url.getFile() +" HTTP/1.1");
+			if(opciones.servidorProxy == null) {
+				enviar=("GET "+ this.url.getFile() +" HTTP/1.1");
+			} else {
+				enviar=("GET "+ this.url +" HTTP/1.1");
+			}
 			this.printer.println(enviar);
 			this.opciones.log("-> "+enviar);
-			enviar=("Host: "+this.url.getHost());
-			this.printer.println(enviar);
-			this.opciones.log("-> "+enviar);
+			if (opciones.servidorProxy == null) {
+				enviar=("Host: "+this.url.getHost());
+				this.printer.println(enviar);
+				this.opciones.log("-> "+enviar);
+			}
 			enviar=("Connection: close\n");
 			this.printer.println(enviar);
 			this.opciones.log("-> "+enviar);
@@ -108,7 +117,7 @@ class Descarga {
 	public boolean recibirRecurso(OutputStream guardar) {
 		boolean cerrar = false;
 		String linea;
-		byte[] buffer = new byte[2048];
+		byte[] buffer = new byte[2049];
 		int leidos = 0;
 
 		while (!cerrar) {
@@ -128,7 +137,6 @@ class Descarga {
 			}
 		}
 		try {
-			guardar.flush();
 			this.socket.close();
 		} catch (Exception e) {
 			System.err.println("No se pudo cerrar el socket");

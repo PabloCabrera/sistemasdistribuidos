@@ -84,6 +84,9 @@ public class Wget {
 			System.out.println ("Descargando en " + nombreGuardar);
 			streamGuardar = new FileOutputStream (nombreGuardar);
 			estado = descarga.recibirRecurso(streamGuardar);
+			streamGuardar.flush();
+			streamGuardar.close();
+			streamGuardar = null;
 			assert (estado) : "No se recibio datos";
 
 		} catch (AssertionError e) {
@@ -94,6 +97,8 @@ public class Wget {
 			return false;
 		} catch (MalformedURLException e) {
 			System.err.println ("No se puede redirigir correctamente. URL no valida");
+		} catch (IOException e) {
+			System.err.println ("Error de entrada/salida");
 		}
 		
 		return true;
@@ -216,7 +221,7 @@ public class Wget {
 					if (args[offset+1].indexOf(':') != -1) {
 						opciones.servidorProxy = args[offset+1].replaceFirst(":.*$", "");
 						try {
-							opciones.puertoProxy = Integer.parseInt (args[offset+1].replaceFirst("^.*;", ""));
+							opciones.puertoProxy = Integer.parseInt (args[offset+1].replaceFirst("^.*:", ""));
 						} catch (NumberFormatException e) {
 							System.err.println("Puerto no valido para servidor proxy");
 						}
@@ -277,7 +282,7 @@ public class Wget {
 		System.err.println("\t -o archivo_log");
 		System.err.println("\t -p directorio_descarga");
 		System.err.println("\t -t numero_reintentos <<NO IMPLEMENTADO>>");
-		System.err.println("\t -http-proxy servidor:puerto <<NO IMPLEMENTADO>>");
+		System.err.println("\t -http-proxy servidor:puerto");
 		System.err.println("\t -http-user usuario <<NO IMPLEMENTADO>>");
 		System.err.println("\t -http-password password <<NO IMPLEMENTADO>>");
 	}
