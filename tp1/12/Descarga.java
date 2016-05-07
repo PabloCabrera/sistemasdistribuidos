@@ -1,10 +1,10 @@
 import java.io.PrintStream;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.util.regex.Pattern;
@@ -16,10 +16,8 @@ class Descarga {
 	private Socket socket;
 	private InputStream input;
 	private OutputStream output;
-	private BufferedReader reader;
 	private PrintStream printer;
 	private String redireccion = null;
-	//static private Pattern regexResultado = new Pattern.compile("^HTTP[^ ]* (\\d{3}).*");
 	
 
 	public Descarga (URL url, WgetOpciones opciones) {
@@ -53,7 +51,6 @@ class Descarga {
 			this.socket = new Socket (servidor, puerto);
 			this.input = socket.getInputStream ();
 			this.output = socket.getOutputStream ();
-			this.reader  = new BufferedReader (new InputStreamReader (this.input));
 			this.printer = new PrintStream (this.output);
 		} catch (Exception e) {
 			return false;
@@ -86,6 +83,28 @@ class Descarga {
 		return true;
 	}
 
+	public String getLinea() {
+		int leido=0;
+		ByteArrayOutputStream barray = new ByteArrayOutputStream();
+		boolean continuar = true;
+
+		while (continuar) {
+			try {
+				leido = this.input.read();
+				if (leido == '\r') {
+				//hacer nada
+				} else if (leido == '\n') {
+					continuar = false;
+				} else {
+					barray.write(leido);
+				}
+			} catch (Exception e) {
+				continuar = false;
+			}
+		}
+		return barray.toString();
+	}
+
 	public int recibirHeaders() {
 		boolean fin_header = false;
 		String linea;
@@ -94,7 +113,7 @@ class Descarga {
 
 		while (!fin_header) {
 			try {
-				linea = this.reader.readLine();
+				linea = this.getLinea();
 				if(linea != null && linea.length() > 0 ) {
 					if (linea.matches ("^HTTP/.*")) {
 						str_codigo_respuesta = linea.replaceFirst("^[^ ]* ", "");
