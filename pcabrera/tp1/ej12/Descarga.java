@@ -1,3 +1,5 @@
+package pcabrera.tp1.ej12;
+
 import java.io.PrintStream;
 import java.io.InputStreamReader;
 import java.io.InputStream;

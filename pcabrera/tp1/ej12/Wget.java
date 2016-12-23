@@ -1,3 +1,5 @@
+package pcabrera.tp1.ej12;
+
 import java.net.Socket;
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -276,15 +278,15 @@ public class Wget {
 		System.err.println("No se han especifcado URLs para descargar");
 		System.err.println("Uso: java Wget [opciones] URLs");
 		System.err.println("Opciones:");
-		System.err.println("\t -c <<NO IMPLEMENTADO>>");
-		System.err.println("\t -n <<NO IMPLEMENTADO>>");
+//		System.err.println("\t -c <<NO IMPLEMENTADO>>");
+//		System.err.println("\t -n <<NO IMPLEMENTADO>>");
 		System.err.println("\t -i archivo_lista");
 		System.err.println("\t -o archivo_log");
 		System.err.println("\t -p directorio_descarga");
-		System.err.println("\t -t numero_reintentos <<NO IMPLEMENTADO>>");
+//		System.err.println("\t -t numero_reintentos <<NO IMPLEMENTADO>>");
 		System.err.println("\t -http-proxy servidor:puerto");
-		System.err.println("\t -http-user usuario <<NO IMPLEMENTADO>>");
-		System.err.println("\t -http-password password <<NO IMPLEMENTADO>>");
+//		System.err.println("\t -http-user usuario <<NO IMPLEMENTADO>>");
+//		System.err.println("\t -http-password password <<NO IMPLEMENTADO>>");
 	}
 
 }
