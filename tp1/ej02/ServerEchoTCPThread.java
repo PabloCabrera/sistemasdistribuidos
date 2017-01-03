@@ -1,4 +1,4 @@
-package pcabrera.tp1.ej02;
+package tp1.ej02;
 
 import java.io.IOException;
 import java.net.ServerSocket;

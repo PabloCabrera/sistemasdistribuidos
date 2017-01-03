@@ -1,8 +1,12 @@
 #!/bin/sh
-mkdir -p out/pcabrera/tp1
-mkdir -p out/pcabrera/tp2
+cd ..
 
-javac -d out pcabrera/tp1/*/*.java
-javac -d out pcabrera/tp2/*/*.java
+mkdir -p out/tp1
+mkdir -p out/tp2
+mkdir -p out/misc
 
+javac -d out tp1/*/*.java
+javac -d out tp2/*/*.java
+javac -d out misc/*.java
 
+cd out

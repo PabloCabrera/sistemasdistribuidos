@@ -1,4 +1,4 @@
-package pcabrera.tp1.ej09;
+package tp1.ej09;
 
 import java.io.File;
 import java.io.FileOutputStream;

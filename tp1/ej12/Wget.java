@@ -1,4 +1,4 @@
-package pcabrera.tp1.ej12;
+package tp1.ej12;
 
 import java.net.Socket;
 import java.net.URL;

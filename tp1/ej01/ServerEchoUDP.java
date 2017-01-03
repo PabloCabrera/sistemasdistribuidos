@@ -1,4 +1,4 @@
-package pcabrera.tp1.ej01;
+package tp1.ej01;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
