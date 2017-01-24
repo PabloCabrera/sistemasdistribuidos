@@ -12,21 +12,18 @@ import java.net.ServerSocket;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-public class ServidorTelnet {
-	/* Debe inicializarse y escuchar en un puerto por conexiones entrantes*/
-	/* Debe ejecutar comandos que envia el cliente */
-	/* Debe registrar todo en un log */
+public class TelnetServer {
 
 	private PrintStream streamLog;
-	private int puerto;
+	private int port;
 	private ServerSocket serverSocket;
-	private boolean terminar = false;
+	private boolean end = false;
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.SSS ");
 
 	public static void main (String[] args) {
-		int arg_puerto = 23;
+		int arg_port = 23;
 		String arg_logfile = null;
-		ServidorTelnet servidor;
+		TelnetServer server;
 
 		
 		if (args.length > 1) {
@@ -35,40 +32,40 @@ public class ServidorTelnet {
 
 		if (args.length > 0) {
 			try {
-				arg_puerto = Integer.parseInt (args[0]);
+				arg_port = Integer.parseInt (args[0]);
 			} catch (NumberFormatException e) {
-				System.err.println ("Warning: \"" + args[0] + "\" no es un numero de puerto valido. Se utilizara el puerto predeterminado: " + arg_puerto);
+				System.err.println ("Warning: \"" + args[0] + "\" no es un numero de port valido. Se utilizara el port predeterminado: " + arg_port);
 			}
 		} else {
 			Scanner scan = new Scanner (System.in);
 			try {
-				System.out.print ("Ingresar numero de puerto: ");
-				String stringPuerto = scan.nextLine();
-				arg_puerto = Integer.parseInt(stringPuerto);
+				System.out.print ("Ingresar numero de port: ");
+				String stringPort = scan.nextLine();
+				arg_port = Integer.parseInt(stringPort);
 			} catch (NumberFormatException e) {
-				System.err.println ("Warning: Puerto no valido. Se utilizara el puerto predeterminado: " + arg_puerto);
+				System.err.println ("Warning: Port no valido. Se utilizara el port predeterminado: " + arg_port);
 			}
 				System.out.print ("Ingresar nombre de archivo log: ");
 				arg_logfile = scan.nextLine();
 		}
 
-		servidor = new ServidorTelnet (arg_puerto, arg_logfile);
+		server = new TelnetServer (arg_port, arg_logfile);
 		
 	}
 	
-	public ServidorTelnet (int puerto, String archivoLog) {
-		this.puerto = puerto;
-		this.inicializarLog (archivoLog);
+	public TelnetServer (int port, String archivoLog) {
+		this.port = port;
+		this.initLog (archivoLog);
 		try {
-			this.inicializarSocket (puerto);
-			this.escuchar();
+			this.initSocket (port);
+			this.listen();
 		} catch (RuntimeException e) {
 			System.err.println(e.getMessage());
 		}
 
 	}
 
-	private void inicializarLog (String archivoLog) {
+	private void initLog (String archivoLog) {
 		try {
 			this.streamLog = new PrintStream (new FileOutputStream (archivoLog, true));
 			
@@ -80,29 +77,29 @@ public class ServidorTelnet {
 
 	}
 
-	private void inicializarSocket (int puerto) {
+	private void initSocket (int port) {
 		try {
-			this.serverSocket = new ServerSocket(this.puerto);
+			this.serverSocket = new ServerSocket(this.port);
 		} catch (IOException e) {
-			throw new RuntimeException("No se puede abrir el puerto especificado", e);
+			throw new RuntimeException("No se puede abrir el port especificado", e);
 		}
 	}
 
-	private void escuchar() {
-		while (!this.terminar){
+	private void listen() {
+		while (!this.end){
 			Socket cliente = null;
 			try {
 				cliente = this.serverSocket.accept();
-				new Thread (new ServidorTelnetThread (cliente, this)).start();
+				new Thread (new TelnetThread (cliente, this)).start();
 			} catch (Exception e) {
 					System.err.println("Error intentando aceptar conexion entrante");
 					System.err.println(e.getMessage());
-					this.terminar = true;
+					this.end = true;
 			}
 		}
 	}
 
-	public String ejecutarComando(String comando, File dir) {
+	public String executeCommand(String comando, File dir) {
 		String resultado;
 		StringBuffer output = new StringBuffer();
 		Process proceso;
@@ -135,11 +132,11 @@ public class ServidorTelnet {
 	}
 
 	public synchronized void log(String mensaje) {
-		this.streamLog.println (this.ahora() + mensaje);
+		this.streamLog.println (this.now() + mensaje);
 	}
 
-	private String ahora () {
-		return ServidorTelnet.dateFormat.format(new Date());
+	private String now () {
+		return TelnetServer.dateFormat.format(new Date());
 	}
 }
 

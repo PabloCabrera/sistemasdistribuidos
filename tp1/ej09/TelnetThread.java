@@ -9,14 +9,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-class ServidorTelnetThread implements Runnable {
-	ServidorTelnet servidor;
+class TelnetThread implements Runnable {
+	TelnetServer server;
 	Socket socket = null;
 	BufferedReader input = null;
 	PrintStream output = null;
 
-	public ServidorTelnetThread (Socket socket, ServidorTelnet servidor) {
-		this.servidor = servidor;
+	public TelnetThread (Socket socket, TelnetServer server) {
+		this.server = server;
 		this.socket = socket;
 		
 		try {
@@ -28,53 +28,53 @@ class ServidorTelnetThread implements Runnable {
 	}
 
 	public void run() {
-		boolean cerrar = false;
-		String linea = null;
+		boolean close = false;
+		String line = null;
 		String dir = null;
 		File fdir = null;
-		String resultado = null;
+		String result = null;
 
-		this.servidor.log ("CONEXION ABIERTA: " + this.socket.getRemoteSocketAddress());
+		this.server.log ("CONEXION ABIERTA: " + this.socket.getRemoteSocketAddress());
 
-		while ( (!this.socket.isInputShutdown()) && (!cerrar)) {
-			this.mostrarPrompt();
+		while ( (!this.socket.isInputShutdown()) && (!close)) {
+			this.prompt();
 			try {
-				linea = this.input.readLine();
+				line = this.input.readLine();
 
-				if(linea != null) {
+				if(line != null) {
 
 					/* Cambiar directorio de trabajo */
-					if (linea.matches ("^cd *$")) {
+					if (line.matches ("^cd *$")) {
 						/* Directorio predeterminado */
 						dir = null;
-					} else if (linea.matches ("^cd (.:)?[/\\\\]")) {
+					} else if (line.matches ("^cd (.:)?[/\\\\]")) {
 						/* Path absoluto */
-						dir = linea.substring(3);
-					} else if (linea.matches ("^cd .*$")) {
+						dir = line.substring(3);
+					} else if (line.matches ("^cd .*$")) {
 						/* Path relativo */
 						if (dir == null) {
-							dir = linea.substring(3);
+							dir = line.substring(3);
 						} else {
-							dir = dir + "/" + linea.substring(3);
+							dir = dir + "/" + line.substring(3);
 						}
 					} else {
 						fdir = (dir == null)? null: new File (dir);
-						resultado = this.servidor.ejecutarComando(linea, fdir);
-						this.output.println(resultado);
+						result = this.server.executeCommand(line, fdir);
+						this.output.println(result);
 					}
 				} else {
-					cerrar = true;
+					close = true;
 				}
 			} catch (Exception e) {
 				System.out.println("Excepcion: " + e.getMessage());
-				cerrar = true;
+				close = true;
 			}
 		}
 
-		this.servidor.log("CONEXION CERRADA: " + this.socket.getRemoteSocketAddress());
+		this.server.log("CONEXION CERRADA: " + this.socket.getRemoteSocketAddress());
 	}	
 
-	private void mostrarPrompt() {
+	private void prompt() {
 		this.output.print("$ ");
 	}
 	
