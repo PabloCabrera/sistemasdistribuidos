@@ -21,7 +21,7 @@ public class TelnetServer {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.SSS ");
 
 	public static void main (String[] args) {
-		int arg_port = 23;
+		int arg_port = 9023;
 		String arg_logfile = null;
 		TelnetServer server;
 
@@ -38,15 +38,8 @@ public class TelnetServer {
 			}
 		} else {
 			Scanner scan = new Scanner (System.in);
-			try {
-				System.out.print ("Ingresar numero de port: ");
-				String stringPort = scan.nextLine();
-				arg_port = Integer.parseInt(stringPort);
-			} catch (NumberFormatException e) {
-				System.err.println ("Warning: Port no valido. Se utilizara el port predeterminado: " + arg_port);
-			}
-				System.out.print ("Ingresar nombre de archivo log: ");
-				arg_logfile = scan.nextLine();
+			System.out.print ("Ingresar nombre de archivo log: ");
+			arg_logfile = scan.nextLine();
 		}
 
 		server = new TelnetServer (arg_port, arg_logfile);
@@ -90,7 +83,7 @@ public class TelnetServer {
 			Socket cliente = null;
 			try {
 				cliente = this.serverSocket.accept();
-				new Thread (new TelnetThread (cliente, this)).start();
+				new Thread (new TelnetServerThread (cliente, this)).start();
 			} catch (Exception e) {
 					System.err.println("Error intentando aceptar conexion entrante");
 					System.err.println(e.getMessage());
@@ -100,7 +93,7 @@ public class TelnetServer {
 	}
 
 	public String executeCommand(String comando, File dir) {
-		String resultado;
+		String result;
 		StringBuffer output = new StringBuffer();
 		Process proceso;
 
@@ -109,9 +102,9 @@ public class TelnetServer {
 			proceso.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
 
-			String linea = "";			
-			while ((linea = reader.readLine())!= null) {
-				output.append(linea + "\n");
+			String line = "";
+			while ((line = reader.readLine())!= null) {
+				output.append(line + "\n");
 			}
 
 		} catch (Exception e) {
@@ -120,14 +113,14 @@ public class TelnetServer {
 			return(errorMsg);
 		}
 
-		resultado = output.toString();
+		result = output.toString();
 		String mensajeLog = 
 			"COMANDO: "+ comando +"\n" +
-			"SALIDA: " + resultado +
+			"SALIDA: " + result +
 			"\n";
 
 		this.log (mensajeLog);
-		return resultado;
+		return result;
 
 	}
 
