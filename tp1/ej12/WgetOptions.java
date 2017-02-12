@@ -5,8 +5,8 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class WgetOpciones {
-	public String servidorProxy = null;
+public class WgetOptions {
+	public String proxyServer = null;
 	public int puertoProxy = 8080;
 	public PrintStream archivoLog = null;
 	public boolean continuarIncompleta = false;
@@ -18,7 +18,7 @@ public class WgetOpciones {
 
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.SSS ");
 
-	public WgetOpciones () {
+	public WgetOptions () {
 	}
 
 	public void log(String texto) {

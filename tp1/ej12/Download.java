@@ -12,26 +12,26 @@ import java.net.URL;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-class Descarga {
+class Download {
 	private URL url;
-	private WgetOpciones opciones;
+	private WgetOptions options;
 	private Socket socket;
 	private InputStream input;
 	private OutputStream output;
 	private PrintStream printer;
-	private String redireccion = null;
+	private String redirect = null;
 	
 
-	public Descarga (URL url, WgetOpciones opciones) {
+	public Download (URL url, WgetOptions options) {
 		this.url = url;
-		this.opciones = opciones;
+		this.options = options;
 	}
 
-	public boolean conectar() {
+	public boolean connect() {
 		int puerto;
 		String servidor;
 
-		if (this.opciones.servidorProxy == null) {
+		if (this.options.proxyServer == null) {
 			servidor = this.url.getHost();
 			puerto = this.url.getPort();
 
@@ -39,12 +39,11 @@ class Descarga {
 				puerto = 80;
 			}
 		} else {
-			servidor = opciones.servidorProxy;
-			puerto = opciones.puertoProxy;
+			servidor = options.proxyServer;
+			puerto = options.puertoProxy;
 			System.out.println ("Utilizando el servidor proxy "+ servidor + ":"+puerto);
-			opciones.log ("Utilizando el servidor proxy "+ servidor + ":"+puerto);
+			options.log ("Utilizando el servidor proxy "+ servidor + ":"+puerto);
 		}
-		
 
 		try {
 			assert (puerto > 0);
@@ -61,31 +60,31 @@ class Descarga {
 		return true;
 	}
 
-	public boolean enviarHeaders () {
+	public boolean sendHeaders () {
 		String enviar ="";
 		try {
-			if(opciones.servidorProxy == null) {
-				enviar=("GET "+ this.url.getFile() +" HTTP/1.1");
+			if(options.proxyServer == null) {
+				enviar=("GET "+ this.url.getFile() +" HTTP/1.1\r\n");
 			} else {
-				enviar=("GET "+ this.url +" HTTP/1.1");
+				enviar=("GET "+ this.url +" HTTP/1.1\r\n");
 			}
-			this.printer.println(enviar);
-			this.opciones.log("-> "+enviar);
-			if (opciones.servidorProxy == null) {
-				enviar=("Host: "+this.url.getHost());
-				this.printer.println(enviar);
-				this.opciones.log("-> "+enviar);
+			this.printer.print(enviar);
+			this.options.log("-> "+enviar);
+			if (options.proxyServer == null) {
+				enviar=("Host: "+this.url.getHost()+"\r\n");
+				this.printer.print(enviar);
+				this.options.log("-> "+enviar);
 			}
-			enviar=("Connection: close\n");
-			this.printer.println(enviar);
-			this.opciones.log("-> "+enviar);
+			enviar=("Connection: close\r\n\r\n");
+			this.printer.print(enviar);
+			this.options.log("-> "+enviar);
 		} catch (Exception e) {
 			return false;
 		}
 		return true;
 	}
 
-	public String getLinea() {
+	public String getLine() {
 		int leido=0;
 		ByteArrayOutputStream barray = new ByteArrayOutputStream();
 		boolean continuar = true;
@@ -107,24 +106,24 @@ class Descarga {
 		return barray.toString();
 	}
 
-	public int recibirHeaders() {
+	public int receiveHeaders() {
 		boolean fin_header = false;
-		String linea;
-		String str_codigo_respuesta;
-		int codigo_respuesta = 200;
+		String line;
+		String str_response_code;
+		int response_code = 200;
 
 		while (!fin_header) {
 			try {
-				linea = this.getLinea();
-				if(linea != null && linea.length() > 0 ) {
-					if (linea.matches ("^HTTP/.*")) {
-						str_codigo_respuesta = linea.replaceFirst("^[^ ]* ", "");
-						str_codigo_respuesta = str_codigo_respuesta.replaceFirst(" .*$", "");
-						codigo_respuesta = Integer.parseInt(str_codigo_respuesta);
-					} else if (linea.matches ("^Location: .*$")) {
-						this.redireccion = linea.replaceFirst ("Location: ", "");
+				line = this.getLine();
+				if(line != null && line.length() > 0 ) {
+					if (line.matches ("^HTTP/.*")) {
+						str_response_code = line.replaceFirst("^[^ ]* ", "");
+						str_response_code = str_response_code.replaceFirst(" .*$", "");
+						response_code = Integer.parseInt(str_response_code);
+					} else if (line.matches ("^Location: .*$")) {
+						this.redirect = line.replaceFirst ("Location: ", "");
 					}
-					opciones.log ("<- " + linea);
+					options.log ("<- " + line);
 				} else {
 					fin_header = true;
 				}
@@ -132,12 +131,12 @@ class Descarga {
 				return -1;
 			}
 		}
-		return codigo_respuesta;
+		return response_code;
 	}
 
-	public boolean recibirRecurso(OutputStream guardar) {
+	public boolean receiveRecurso(OutputStream guardar) {
 		boolean cerrar = false;
-		String linea;
+		String line;
 		byte[] buffer = new byte[2049];
 		int leidos = 0;
 
@@ -165,8 +164,8 @@ class Descarga {
 		return true;
 	}
 
-	public String getRedireccion () {
-		return this.redireccion;
+	public String getRedirect () {
+		return this.redirect;
 	}
 
 }
