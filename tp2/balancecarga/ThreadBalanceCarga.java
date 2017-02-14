@@ -5,8 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import tp2.otros.Hilo;
-
 public class ThreadBalanceCarga extends Hilo {
 	
 	protected Integer id;

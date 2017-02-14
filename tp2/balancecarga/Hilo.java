@@ -1,4 +1,4 @@
-package tp2.otros;
+package tp2.balancecarga;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

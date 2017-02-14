@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
 
-import tp2.otros.Hilo;
+import tp2.balancecarga.Hilo;
 
 public class ThreadHoraLocal extends Hilo {
 	
