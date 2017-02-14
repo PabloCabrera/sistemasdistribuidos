@@ -5,9 +5,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class Cliente {
-	
+	private final static long TIEMPO_ACTUALIZACION = 5000;
 	protected String ip;
 	protected Integer puerto;
 	protected Socket s;
@@ -49,20 +51,38 @@ public class Cliente {
 			e.printStackTrace();
 		}
 		
+		SimpleDateFormat formato_hora = new SimpleDateFormat("hh:mm:ss a");
 		
 		try {
 			while(true){
-				String s="dame la hora wacho!";
+				String s="SOLICITUD DE HORA";
 				//no hay protocolo, le envio un String con cualquier cosa y recibo un String con la hora
 				long inicio = System.currentTimeMillis();
+				Date horaReloj = new Date(inicio);
 				escribir.writeObject(s);
-				String respuesta=(String) leer.readObject();
+				Date respuesta=(Date) leer.readObject();
 				long fin = System.currentTimeMillis();
-				System.out.println("el servidor me respondio:");
-				System.out.println(respuesta);
+				
+				if (respuesta == null) {
+					System.err.println("El servidor no envio la hora correctamente.");
+				} else {
+				
+				System.out.println("Hora en reloj local: ");
+				System.out.println(formato_hora.format (horaReloj));
+				System.out.println();
+
+				System.out.println("Hora en reloj de servidor remoto:");
+				System.out.println(formato_hora.format (respuesta));
+				System.out.println();
+
+				System.out.print("Diferencia: ");
+				long time_respuesta = respuesta.getTime() % (24l*60l*60l*1000l);
+				long time_reloj = horaReloj.getTime() % (24l*60l*60l*1000l);
+				System.out.println( (time_respuesta - time_reloj) / 1000 + " segundos");
 				long diferencia = fin - inicio;
-				System.out.println("el servidor tardo: "+diferencia+"ms en responder");
-				Thread.sleep(5000);
+				System.out.println("El servidor tardo: "+diferencia+"ms en responder");
+				}
+				Thread.sleep(TIEMPO_ACTUALIZACION);
 			}
 		} catch (IOException | InterruptedException | ClassNotFoundException e) {
 			System.out.println("error al enviar o recibir informacion del servidor");

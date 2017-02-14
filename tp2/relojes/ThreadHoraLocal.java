@@ -26,7 +26,7 @@ public class ThreadHoraLocal extends Hilo {
 			}
 			if(enviando){
 				try {
-					String fecha = this.conseguirHora();
+					Date fecha = this.conseguirHora();
 					//System.out.println("envio la hora:" +fecha);
 					this.outStrm.writeObject(fecha);
 				} catch (IOException e) {
@@ -38,12 +38,11 @@ public class ThreadHoraLocal extends Hilo {
 	}
 	
 	@SuppressWarnings("deprecation")
-	protected String conseguirHora(){
+	protected Date conseguirHora(){
 		String hora=null;
 		
 		Date fechaYHora = new Date();
-		hora="Hora Local: "+ fechaYHora.getHours() +":"+fechaYHora.getMinutes()+":" +fechaYHora.getSeconds();
-		return hora;
+		return fechaYHora;
 	}
 	
 }
