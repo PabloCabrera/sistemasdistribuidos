@@ -14,7 +14,7 @@ import java.nio.channels.FileLock;
 
 public class ManejadorArchivo {
 	
-	public static String pathEJ2y3="cuentas/Cuentas.txt";
+	public static String pathEJ2y3="cuentas/Cuentas.bin";
 	
 	//metodo que chequea si existe un archivo
 	public static boolean chequearExistencia(String path){
@@ -207,7 +207,7 @@ public class ManejadorArchivo {
 		return true;
 	}
 	
-	public static boolean escribirMontoThreadSafe(Integer id, Integer monto,String path, Integer tiempoDeEspera){
+	public synchronized static boolean escribirMontoThreadSafe(Integer id, Integer monto,String path, Integer tiempoDeEspera){
 		File sharedLockFile = new File(path);
 		FileChannel channel;
 		RandomAccessFile directo;
@@ -256,7 +256,7 @@ public class ManejadorArchivo {
 		return true;
 	}
 	
-	public static boolean lockFile(String path) {
+	public synchronized static boolean lockFile(String path) {
 		File sharedLockFile = new File(path);
 		FileChannel channel;
 		FileLock lock;
@@ -276,7 +276,7 @@ public class ManejadorArchivo {
 		   return true;
 	}
 
-	public static boolean unlockFile(String path){
+	public synchronized static boolean unlockFile(String path){
 		File sharedLockFile = new File(path);
 		try{	
 			FileChannel channel = new RandomAccessFile(sharedLockFile, "rw").getChannel();;
@@ -299,54 +299,5 @@ public class ManejadorArchivo {
 		return true;
 	}
 	
-	/**
-	 * METODO PARA CREAR UNA CARPETA
-	 */
-	
-	/*
-	 * The mkdir( ) method creates a directory, returning true on success and false on failure.
-	 *  Failure indicates that the path specified in the File object already exists,
-	 *   or that the directory cannot be created because the entire path does not exist yet.
-	 * 
-	  public static void main(String args[]) {
-	      String dirname = "/tmp/user/java/bin";
-	      File d = new File(dirname);
-	      // Create directory now.
-	      d.mkdirs();
-  		}
-  		Java automatically takes care of path separators on UNIX and Windows as per conventions.
-  		If you use a forward slash (/) on a Windows version of Java, the path will still resolve correctly.
-	 */
-	
-	/**
-	 * METODO PARA LISTAR CARPETAS Y ARCHIVOS EN UN PATH
-	 */
-	/*
-	 * You can use list( ) method provided by File object to list down all the files and 
-	 * directories available in a directory as follows:
-	 * 
-	 * 
-	 * public static void main(String[] args) {
-      
-	      File file = null;
-	      String[] paths;   
-		      try{      
-		         // create new file object
-		         file = new File("/tmp");
-		                                 
-		         // array of files and directory
-		         paths = file.list();
-		            
-		         // for each name in the path array
-		         for(String path:paths)
-		         {
-		            // prints filename and directory name
-		            System.out.println(path);
-		         }
-		      }catch(Exception e){
-		         // if any error occurs
-		         e.printStackTrace();
-		      }
-   		}
-	 */
+
 }
