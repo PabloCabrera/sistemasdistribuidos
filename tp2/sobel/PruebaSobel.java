@@ -23,7 +23,7 @@ public class PruebaSobel extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.show();
 		try {
-			BufferedImage img_in = ImageIO.read (new File("ej_4/imagen_prueba2.jpg"));
+			BufferedImage img_in = ImageIO.read (new File("sobel/imagen_prueba2.jpg"));
 			this.setImg(img_in);
 			Date antes = new Date();
 			WorkerSobel worker = new WorkerSobel();

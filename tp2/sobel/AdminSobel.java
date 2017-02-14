@@ -28,8 +28,8 @@ import javax.swing.JFrame;
 
 public class AdminSobel extends JFrame{
 	protected final static int NUM_DIVISIONES = 4;
-	protected final static String HOSTLIST_FILE = "ej_4/hostlist.txt";
-	protected final static String INPUT_FILE = "ej_4/imagen_prueba2.jpg";
+	protected final static String HOSTLIST_FILE = "sobel/hostlist.txt";
+	protected final static String INPUT_FILE = "sobel/imagen_prueba2.jpg";
 
 	protected BufferedImage imagen_fuente = null;
 	protected BufferedImage imagen_procesada = null;
