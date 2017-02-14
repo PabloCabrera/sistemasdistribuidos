@@ -1,0 +1,7 @@
+# Lista de servidores workers (aquellos que procesan la imagen)
+# formato:
+# hostname nombre_registro
+localhost Sobel1
+localhost Sobel2
+localhost Sobel3
+localhost Sobel4
